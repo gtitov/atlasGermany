@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Атлас Германии</title>
 
-  <!-- CSS  -->
+  <!-- CSS -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
@@ -23,18 +23,20 @@
       </ul>
 
       <ul id="nav-mobile" class="sidenav">
-        <li><a href="#">Об атласе</a></li>
-        <li><a href="#">Карты</a></li>
+        <li><a href="./">Об атласе</a></li>
+        <li><a href="maps.html">Карты</a></li>
       </ul>
       <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
     </div>
   </nav>
+
 
   <div style="min-height: 200px;">
       <section id="map" style="margin-top: 4px;">
           <img src="" style="display: block; width: 100%; margin-left: auto; margin-right: auto;">  <!-- 'display: block' to eliminate gap between the picture and a footer -->
       </section>
   </div>
+
 
   <footer class="page-footer teal">
     <div class="container">
@@ -65,135 +67,24 @@
     </div>
   </footer>
 
+
   <div class="sidenav" id="slider" style="padding: 20px; width: 400px">
     <h4 class="light">Содержание</h4>
     <div id="table_container"></div>
   </div>
 
 
-  <!--  Scripts-->
-  <script src="js/materialize.min.js"></script>
-  <script src="js/init.js"></script>
-  <script src="./js/CollapsibleLists.js"></script>
+  <!-- Scripts -->
+  <script src="js/materialize.min.js">/* Load materialize */</script>
 
-  <!-- Materialize features initialization-->
-  <script>
-      document.addEventListener('DOMContentLoaded', function () {
-          // Slider
-          var sliders = document.querySelector('#slider');
-          var instances_s = M.Sidenav.init(sliders, { edge: 'right' });
-      });
-  </script>
-
-  <script>
-    /* Объявляем переменные хранения данных */
-    var maps
-    var sections
-    var subsections
-
-    /* Получаем данные */
-    loadData("./php/getMaps.php", getMaps);
-    loadData("./php/getSections.php", getSections);
-    loadData("./php/getSubsections.php", getSubsections);
-
-
-
-
-    /* Создаём таблицу содержания */
-    /* Создаём разделы */
-    var sect_ul = "<ul id = 'sect_list'>";  // Открываем ul для списка карт
-    for (var s in sections) {
-      sect_ul +=
-        "<li style='line-height: 2;' class='sect' id='sect" + sections[s].id + "'>&#9662; "  // Создаём li с названием каждого раздела; id равен индексу раздела в массиве 'sections' с префиксом 'sect'
-        + sections[s].title +
-        "<ul style = 'padding-left: 15px'></ul></li>";
-    }
-    sect_ul += "</ul>";  // Закрываем ul для списка разделов
-    document.getElementById('table_container').innerHTML += sect_ul; // Помещаем ul в раздел 'content_table'
-
-    /* Распределяем карты по секциям (разделам, подразделам) */
-    for (var m in maps) {
-      map = maps[m];
-      /* Кладём карты, которые в раздел */
-      if (map.subsection_id === null) {
-        document.getElementById("sect" + map.section_id).getElementsByTagName("ul")[0].innerHTML +=
-          "<li style='line-height: 1.5;' class='map' id='map" + map.id + "'>&#8226; " + map.title + "</li>";
-        /* Кладём карты, которые в подраздел */
-      } else {
-        if (document.getElementById("subsect" + map.subsection_id) === null) {  // Если подраздела не существует
-          document.getElementById("sect" + map.section_id).getElementsByTagName("ul")[0].innerHTML +=  // Создаём подраздел в разделе
-            "<li style='line-height: 1.7;' class='subsect' id='subsect" + map.subsection_id + "'>&#9662; "  // Присваемаем li class подраздела и id
-            + subsections.filter(subsection => subsection.id == map.subsection_id)[0].title +  // Извлекаем из массива подразделов элемент, id которого совпадает с id подраздела из объекта карты
-            "<ul style = 'padding-left: 15px'></ul></li>";
-        }
-        document.getElementById("subsect" + map.subsection_id).getElementsByTagName("ul")[0].innerHTML +=  // Кладём карту в подраздел
-          "<li style='line-height: 1.5;' class='map' id='map" + map.id + "'>&#8226; " + map.title + "</li>";
-      }
-    }
-
-
-
-
-    /* Интерактивность содержания: показать выходные данные */
-    document.getElementById("sect_list").addEventListener("click", function (event) {
-      var li_element = event.target;
-      if (li_element) {
-        if (li_element.matches("li.sect.collapsibleListOpen")) {  // если действия происходят уже после щелчка, когда присвоен class="...Open"
-          var sect_id = li_element.id.substr(4);  // Извлекаем число (id в таблице) из html-id
-          document.getElementById("map").getElementsByTagName("img")[0].setAttribute("src", "./covers/" + sect_id + ".jpg");
-          document.getElementById("map").getElementsByTagName("img")[0].setAttribute("alt", "Обложка временно недоступна");
-        } else if (li_element.matches("li.subsect.collapsibleListOpen")) {
-          var subsect_id = li_element.id.substr(7);
-        } else if (li_element.matches("li.map")) {
-          var map_id = li_element.id.substr(3);
-          document.getElementById("map").getElementsByTagName("img")[0].setAttribute("src", "./maps/" + map_id + ".png");
-          document.getElementById("map").getElementsByTagName("img")[0].setAttribute("alt", "Карта временно недоступна");
-        }
-      }
-
-    })
-
-
-    /* Функция синхронного(!) ajax-запроса (метод устарел -> надо найти, чем заменить) */
-    function loadData(phpFile, cFunction) {
-      var xhr = new XMLHttpRequest();  // Создаём XMLHttpRequest-объект
-      xhr.open("GET", phpFile, async = false);  // Открываем файл по адресу phpFile, выполняем GET-запрос; неасинхронный, чтобы положить данные в переменную
-      xhr.onload = function () {
-        if (this.status == 200) {  // Если запрос успешен (код 200),
-          cFunction(this);  // то выполняем функцию, которая принимает на вход xhr-объект
-        }
-      }
-      xhr.send();
-    }
-
-
-    /* Фунцкции обработки полученных ajax-ом данных */
-    function getMaps(xhr) {
-      maps = JSON.parse(xhr.responseText);  // Парсим все карты, которые пришли
-      document.getElementById("map").getElementsByTagName("img")[0].setAttribute("src", "./maps/0.png");  // Сразу отображаем первую карту массива: изображение
-    }
-
-    function getSections(xhr) {
-      sections = JSON.parse(xhr.responseText);
-    }
-
-    function getSubsections(xhr) {
-      subsections = JSON.parse(xhr.responseText);
-    }
-
-    function getSeries(xhr) {
-      series = JSON.parse(xhr.responseText);
-    }
-  </script>
-
-
-
-  <!-- Interactive elements -->
-  <script>
-    /* Content table expand/collapse */
-    CollapsibleLists.applyTo(document.getElementById('sect_list')); // Используем библиотеку
-  </script>
+  <script src="js/init.js">/* Initialize materialize components */</script>
   <script>M.toast({html: 'Обратите внимание!<br>На загрузку карты требуется 10-20 секунд!'})</script>
+
+  <script src="js/content.js">/* Get content */</script>
+
+  <script src="./js/CollapsibleLists.js">/* Content table expand/collapse */</script>
+  <script>CollapsibleLists.applyTo(document.getElementById('sect_list'));</script>
+
 
   </body>
 </html>
