@@ -53,7 +53,7 @@ loadData("./php/getSubsections.php", getSubsections);
 var sect_ul = "<ul id = 'sect_list'>";  // Открываем ul для списка карт
 for (var s in sections) {
   sect_ul +=
-    "<li style='line-height: 2;' class='sect' id='sect" + sections[s].id + "'>&#9662; "  // Создаём li с названием каждого раздела; id равен индексу раздела в массиве 'sections' с префиксом 'sect'
+    "<li style='line-height: 2; cursor: pointer' class='sect' id='sect" + sections[s].id + "'>&#9662; "  // Создаём li с названием каждого раздела; id равен индексу раздела в массиве 'sections' с префиксом 'sect'
     + sections[s].title +
     "<ul style = 'padding-left: 15px'></ul></li>";
 }
@@ -66,17 +66,17 @@ for (var m in maps) {  // пробегаемся по всем картам
   /* Кладём карты, которые в раздел */
   if (map.subsection_id === null) {
     document.getElementById("sect" + map.section_id).getElementsByTagName("ul")[0].innerHTML +=
-      "<li style='line-height: 1.5;' class='map' id='map" + map.id + "'>&#8226; " + map.title + "</li>";
+      "<li style='line-height: 1.5; cursor: pointer' class='map' id='map" + map.id + "'>&#8226; " + map.title + "</li>";
     /* Кладём карты, которые в подраздел */
   } else {
     if (document.getElementById("subsect" + map.subsection_id) === null) {  // Если подраздела не существует
       document.getElementById("sect" + map.section_id).getElementsByTagName("ul")[0].innerHTML +=  // Создаём подраздел в разделе
-        "<li style='line-height: 1.7;' class='subsect' id='subsect" + map.subsection_id + "'>&#9662; "  // Присваемаем li class подраздела и id
+        "<li style='line-height: 1.7; cursor: pointer' class='subsect' id='subsect" + map.subsection_id + "'>&#9662; "  // Присваемаем li class подраздела и id
         + subsections.filter(subsection => subsection.id == map.subsection_id)[0].title +  // Извлекаем из массива подразделов элемент, id которого совпадает с id подраздела из объекта карты
         "<ul style = 'padding-left: 15px'></ul></li>";
     }
     document.getElementById("subsect" + map.subsection_id).getElementsByTagName("ul")[0].innerHTML +=  // Кладём карту в подраздел
-      "<li style='line-height: 1.5;' class='map' id='map" + map.id + "'>&#8226; " + map.title + "</li>";
+      "<li style='line-height: 1.5; cursor: pointer' class='map' id='map" + map.id + "'>&#8226; " + map.title + "</li>";
   }
 }
 
